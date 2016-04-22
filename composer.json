@@ -1,0 +1,23 @@
+{
+	"name": "phputil/datatables",
+	"type": "library",
+	"description": "PHP representation of Datatables' request and response.",
+	"keywords": [ "table", "datatables", "php", "jquery" ],
+	"homepage": "http://github.com/thiagodp/datatables",
+	"license": "LGPL-3",
+	"authors": [ { "name": "Thiago Delgado Pinto" } ],
+	"support": {
+		"issues": "https://github.com/thiagodp/datatables/issues",
+		"source": "https://github.com/thiagodp/datatables"
+	},
+	"require": {
+		"php": ">=5.2.0"
+	},
+	"require-dev": {
+	},
+	"suggest": {
+	},
+	"autoload": {
+		"psr-4": { "phputil\\": "lib/" }
+	}
+}
