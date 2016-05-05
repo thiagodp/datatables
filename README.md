@@ -19,6 +19,7 @@ composer require phputil/datatables
 ```php
 <?php
 require_once 'vendor/autoload.php';
+
 use phputil\DataTablesRequest;
 use phputil\DataTablesResponse;
 
@@ -39,7 +40,6 @@ $search = $req->search(); // null in case of not having search
 // FILTERING
 //	Let's say that we have two filters in the client side:
 //	"id", and "name". So..
-
 $filters = $req->filters();
 $idFilter = isset( $filters[ 'id' ] ) ? $filters[ 'id' ] : null;
 $nameFilter = isset( $filters[ 'name' ] ) ? $filters[ 'name' ] : null;
