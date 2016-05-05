@@ -20,22 +20,27 @@ composer require phputil/datatables
 <?php
 require_once 'vendor/autoload.php';
 use phputil\DataTablesRequest;
+use phputil\DataTablesResponse;
+
+//
+// REQUEST
+//
 
 $dataSentByDatatablesViaPost = $_POST;
-$dtr = new DataTablesRequest( $dataSentByDatatablesViaPost );
+$req = new DataTablesRequest( $dataSentByDatatablesViaPost );
 
 // PAGINATION
-$limit = $dtr->limit();
-$offset = $dtr->offset();
+$limit = $req->limit();
+$offset = $req->offset();
 
 // SEARCHING
-$search = $dtr->search(); // null in case of not having search
+$search = $req->search(); // null in case of not having search
 
 // FILTERING
 //	Let's say that we have two filters in the client side:
 //	"id", and "name". So..
 
-$filters = $dtr->filters();
+$filters = $req->filters();
 $idFilter = isset( $filters[ 'id' ] ) ? $filters[ 'id' ] : null;
 $nameFilter = isset( $filters[ 'name' ] ) ? $filters[ 'name' ] : null;
 
@@ -43,10 +48,26 @@ $nameFilter = isset( $filters[ 'name' ] ) ? $filters[ 'name' ] : null;
 //	Originally, Datatables returns the sort order
 //	by column index, but here you can get it using
 //	your own column names.
-$orders = $dtr->orders( array( 'id', 'name' ) );
+$orders = $req->orders( array( 'id', 'name' ) );
 $idOrder = isset( $orders[ 'id' ] ) ? $orders[ 'id' ] : null;
 $nameOrder = isset( $orders[ 'name' ] ) ? $orders[ 'name' ] : null;
 var_dump( $idOrder ); // null, that means "not ordered by id"
 var_dump( $nameOrder ); // string("asc")
+
+...
+
+//
+// RESPONSE
+//
+
+$totalCount = ... // count your total table items
+$filteredCount = ... // count your filtered items
+$data = ... // your array
+$draw = $req->draw(); // This a Datatables' control data
+
+$res = new DataTablesResponse(
+	$totalCount, $filteredCount, $data, $draw );
+	
+echo json_encode( $res );
 ?>
 ```
