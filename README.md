@@ -6,7 +6,7 @@ Main files:
 * Class [phputil\DataTablesRequest](https://github.com/thiagodp/datatables/blob/master/lib/DataTablesRequest.php)
 * Class [phputil\DataTablesResponse](https://github.com/thiagodp/datatables/blob/master/lib/DataTablesResponse.php)
 
-This project uses [semantic versioning](http://semver.org/).
+This project uses [semantic versioning](http://semver.org/). See our [releases](https://github.com/thiagodp/datatables/releases).
 
 ### Installation
 
@@ -34,7 +34,7 @@ $req = new DataTablesRequest( $dataSentByDatatablesViaPost );
 $limit = $req->limit();
 $offset = $req->offset();
 
-// SEARCHING
+// SEARCH
 $search = $req->search(); // null in case of not having search
 
 // FILTERING
@@ -63,7 +63,7 @@ var_dump( $nameOrder ); // string("asc")
 $totalCount = ... // count your total table items
 $filteredCount = ... // count your filtered items
 $data = ... // your array
-$draw = $req->draw(); // This a Datatables' control data
+$draw = $req->draw(); // This is a Datatables' control data
 
 $res = new DataTablesResponse(
 	$totalCount, $filteredCount, $data, $draw );
