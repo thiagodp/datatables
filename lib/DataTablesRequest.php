@@ -124,7 +124,7 @@ class DataTablesRequest {
 		$columns = $this->request[ self::KEY_ORDER ];
 		foreach ( $columns as $value ) {
 				if ( ! isset( $value[ self::KEY_ORDER_COLUMN_INDEX ], $value[ self::KEY_ORDER_DIRECTION ] ) ) { continue; }
-				$index = $value[ self::KEY_ORDER_COLUMN_INDEX ];
+				$index = intval( $value[ self::KEY_ORDER_COLUMN_INDEX ] );
 				$orders[ $fieldNames[ $index ] ] = $value[ self::KEY_ORDER_DIRECTION ];
 		}
 		return $orders;
