@@ -27,6 +27,18 @@ class DataTablesRequest {
 	public $search = array();
 	/** @var array */
 	public $order = array();
+	
+	/**
+	 * Constructor
+	 *
+	 * @param array $request	Request array. OPTIONAL.
+	 * @return object			New instance.
+	 */
+	public function __construct( array $request = array() ) {
+		if ( count( $request ) > 0 ) {
+			$this->fromArray( $request );
+		}
+	}
 
 	/**
 	 * Retrieve values from an array.

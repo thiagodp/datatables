@@ -54,7 +54,7 @@ class DataTablesRequestTest extends PHPUnit_Framework_TestCase {
     }
 
     function test_can_create_request() {
-        $dtr = ( new DataTablesRequest() )->fromArray( $this->req );
+        $dtr = new DataTablesRequest( $this->req );
         $this->assertEquals( 1, $dtr->draw );
         $this->assertEquals( 2, $dtr->start );
         $this->assertEquals( 3, $dtr->length );
@@ -68,18 +68,18 @@ class DataTablesRequestTest extends PHPUnit_Framework_TestCase {
     }
 
     function test_return_search_value() {
-        $dtr = ( new DataTablesRequest() )->fromArray( $this->req );
+        $dtr = new DataTablesRequest( $this->req );
         $this->assertEquals( 'hello', $dtr->searchValue() );
     }
 
     function test_return_column_search() {
-        $dtr = ( new DataTablesRequest() )->fromArray( $this->req );
+        $dtr = new DataTablesRequest( $this->req );
         $this->assertEquals( array( 'name' => 'Bob', 'age' => 21 ),
             $dtr->columnSearch() );
     }
 
     function test_return_column_order() {
-        $dtr = ( new DataTablesRequest() )->fromArray( $this->req );
+        $dtr = new DataTablesRequest( $this->req );
         $this->assertEquals( array( 'name' => 'ASC', 'age' => 'DESC' ),
             $dtr->columnOrder() );
     }    
