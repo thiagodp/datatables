@@ -1,145 +1,133 @@
 <?php
-namespace phputil;
+namespace phputil\datatables;
+
+use phputil\traits\FromArray;
 
 /**
- * Request format used by DataTables.
+ * DataTables Request.
  *
  * @author	Thiago Delgado Pinto
- *
  * @see		https://datatables.net/manual/server-side#Sent-parameters 
  */
 class DataTablesRequest {
 
-	const KEY_DRAW					= 'draw';
-	// Limit, Offset
-	const KEY_LIMIT					= 'length';
-	const KEY_OFFSET				= 'start';
-	// Search
-	const KEY_SEARCH				= 'search';
-	const KEY_SEARCH_VALUE			= 'value';
-	// Filter
-	const KEY_COLUMNS				= 'columns';
-	const KEY_COLUMN_NAME			= 'data';
-	const KEY_COLUMN_SEARCH			= 'search';
-	const KEY_COLUMN_SEARCH_VALUE	= 'value';
-	// Order
-	const KEY_ORDER					= 'order';
-	const KEY_ORDER_COLUMN_INDEX	= 'column';
-	const KEY_ORDER_DIRECTION		= 'dir';
+	use FromArray {
+		fromArray as private attributesFromArray;
+	}
 
-	
-	private $request; // Holds a reference to the request array
-	
+	/** @var integer */
+	public $draw;
+	/** @var integer */
+	public $start;
+	/** @var integer */
+	public $length;
+	/** @var array */
+	public $columns = array();
+	/** @var array */
+	public $search = array();
+	/** @var array */
+	public $order = array();
 
 	/**
-	 * @param array $requestArray	the reference to the request array.
+	 * Retrieve values from an array.
+	 *
+	 * @param array $a	Input array.
+	 * @return object	Reference to $this.
 	 */
-	function __construct( array &$requestArray ) {
-		$this->request = &$requestArray;
+	public function fromArray( array $a ) {
+
+		$this->attributesFromArray( $a );
+
+		$this->draw = intval( $this->draw );
+		$this->start = intval( $this->start );
+		$this->length = intval( $this->length );
+
+		// Columns
+		$newColumns = array();
+		foreach ( $this->columns as $col ) {
+			$c = new RequestColumn();
+			$c->fromArray( $col );
+
+			// Column search
+			$s = new RequestSearch();
+			$s->fromArray( $c->search );
+			$c->search = $s;
+
+			$newColumns []= $c;
+		}
+		$this->columns = $newColumns;
+
+		// Search
+		$s = new RequestSearch();
+		$s->fromArray( $this->search );
+		$this->search = $s;
+
+		// Order
+		$newOrder = array();
+		foreach ( $this->order as $ord ) {
+			$o = new RequestOrder();
+			$o->fromArray( $ord );
+			$newOrder []= $o;
+		}
+		$this->order = $newOrder;
+
+		return $this;
 	}
 
-	//
-	// REQUEST CHECKING
-	//
-
-	/** @return bool */
-	function hasDraw() {
-		return isset( $this->request[ self::KEY_DRAW ] );
+	/**
+	 * Return the search value.
+	 *
+	 * @return string | null
+	 */
+	function searchValue() {
+		return isset( $this->search ) ? $this->search->value : null;
 	}
-	
-	/** @return bool */
-	function hasLimit() {
-		return isset( $this->request[ self::KEY_LIMIT ] );
+
+
+	/**
+	 * Return column search values.
+	 *
+	 * Example:
+	 *		array( 'name' => 'Bob', age='21' )
+	 *
+	 * @return array
+	 */
+	public function columnSearch() {
+		$s = array();
+		foreach ( $this->columns as $col ) {
+			if ( isset( $col->search, $col->data ) ) {
+				$s[ $col->data ]= $col->search->value;
+			}
+		}
+		return $s;
 	}	
-	
-	/** @return bool */
-	function hasOffset() {
-		return isset( $this->request[ self::KEY_OFFSET ] );
-	}
 
-	/** @return bool */
-	function hasSearch() {
-		return isset( $this->request[ self::KEY_SEARCH ], $this->request[ self::KEY_SEARCH ][ self::KEY_SEARCH_VALUE ] );
-	}
-	
-	
-	//
-	// VALUES
-	//
-	
-	/** @return int */
-	function draw() {
-		return $this->naturalNumberFromKey( self::KEY_DRAW );
-	}
 
-	/** @return int */
-	function limit() {
-		return $this->naturalNumberFromKey( self::KEY_LIMIT );
-	}
-	
-	/** @return int */
-	function offset() {
-		return $this->naturalNumberFromKey( self::KEY_OFFSET );
-	}
-	
-	/** @return string or null */
-	function search() {
-		return $this->hasSearch() ? $this->request[ self::KEY_SEARCH ][ self::KEY_SEARCH_VALUE ] : null;
-	}
-	
 	/**
-	 * Return the filters as a map with the field names and its corresponding values.
-	 * @return	array			
+	 * Return the columns with ordering and and their order direction.
+	 *
+	 * Example:
+	 *		array( 'name' => 'ASC', 'age' => 'DESC' );
+	 *
+	 * @return array
 	 */
-	function filters() {
-		if ( ! isset( $this->request[ self::KEY_COLUMNS ] ) ) { return array(); }
-		$filters = array();
-		$columns = $this->request[ self::KEY_COLUMNS ];
-		
-		foreach ( $columns as $col ) {
-	
-			if ( ! isset(	$col[ self::KEY_COLUMN_NAME ],
-							$col[ self::KEY_COLUMN_SEARCH ],
-							$col[ self::KEY_COLUMN_SEARCH ][ self::KEY_COLUMN_SEARCH_VALUE ] ) )	{
+	public function columnOrder() {
+		$o = array();
+		foreach ( $this->order as $ord ) {
+			$colIndex = $ord->column;
+			if ( ! isset( $this->columns[ $colIndex ] ) ) {
 				continue;
 			}
-			
-			$name = $col[ self::KEY_COLUMN_NAME ];
-			$search = $col[ self::KEY_COLUMN_SEARCH ][ self::KEY_COLUMN_SEARCH_VALUE ];
-			
-			$filters[ $name ] = $search;
+			$col = $this->columns[ $colIndex ];
+			$data = $col->data; // "name"
+			if ( ! isset( $data ) ) {
+				continue;
+			}
+			$o[ $data ] = mb_strtoupper( $ord->dir );
 		}
-		return $filters;
+		return $o;
 	}
-	
-	/**
-	 * Return the orders from a request array.
-	 *
-	 * @param	array $fieldNames	an aray containing the field names.
-	 * @return	array				a map with the field names and its corresponding order directions (ASC or DESC).
-	 */
-	function orders( array $fieldNames ) {
-		if ( ! isset( $this->request[ self::KEY_ORDER ] ) ) { return array(); }
-		$orders = array();
-		$columns = $this->request[ self::KEY_ORDER ];
-		foreach ( $columns as $value ) {
-				if ( ! isset( $value[ self::KEY_ORDER_COLUMN_INDEX ], $value[ self::KEY_ORDER_DIRECTION ] ) ) { continue; }
-				$index = intval( $value[ self::KEY_ORDER_COLUMN_INDEX ] );
-				if ( ! isset( $fieldNames[ $index ], $orders[ $fieldNames[ $index ] ] ) ) { continue; }
-				$orders[ $fieldNames[ $index ] ] = $value[ self::KEY_ORDER_DIRECTION ];
-		}
-		return $orders;
-	}
-	
-	/** @return int */	
-	private function naturalNumberFromKey( $key ) {
-		if ( ! isset( $this->request[ $key ] ) ) {
-			return 0;
-		}
-		$value = intval( $this->request[ $key ] );
-		return ( $value < 0 ) ? 0 : $value;
-	}
-	
+
 }
 
 ?>

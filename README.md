@@ -14,7 +14,52 @@ This project uses [semantic versioning](http://semver.org/). See our [releases](
 composer require phputil/datatables
 ```
 
-### Example
+### Example on version `2.x`
+
+```php
+<?php
+require_once 'vendor/autoload.php';
+
+use phputil\datatables\DataTablesRequest;
+use phputil\datatables\DataTablesResponse;
+
+//
+// REQUEST
+//
+$req = new DataTablesRequest( $_POST );
+
+// PAGINATION
+$offset = $req->start;
+$limit = $req->length;
+
+// SEARCH
+$searchValue = $req->searchValue(); // Example: 'Alice'
+
+// FILTERING
+$search = $req->columnSearch(); // Example: array( 'name' => 'Bob', 'age' => 21 )
+
+// SORTING
+$order = $req->columnOrder(); // Example: array( 'name' => 'ASC', 'age' => 'DESC' )
+
+...
+
+//
+// RESPONSE
+//
+$totalCount = /* total number of records to return */
+$filteredCount = /* filtered number of records to return */
+$data = /* items to return */
+$draw = $req->draw; // From the request
+
+$res = new DataTablesResponse(
+	$totalCount, $filteredCount, $data, $draw );
+	
+echo json_encode( $res );
+?>
+```
+
+
+### Example on version `1.x`
 
 ```php
 <?php
@@ -26,9 +71,7 @@ use phputil\DataTablesResponse;
 //
 // REQUEST
 //
-
-$dataSentByDatatablesViaPost = $_POST;
-$req = new DataTablesRequest( $dataSentByDatatablesViaPost );
+$req = new DataTablesRequest( $_POST );
 
 // PAGINATION
 $limit = $req->limit();
@@ -38,32 +81,23 @@ $offset = $req->offset();
 $search = $req->search(); // null in case of not having search
 
 // FILTERING
-//	Let's say that we have two filters in the client side:
-//	"id", and "name". So..
-$filters = $req->filters();
-$idFilter = isset( $filters[ 'id' ] ) ? $filters[ 'id' ] : null;
-$nameFilter = isset( $filters[ 'name' ] ) ? $filters[ 'name' ] : null;
+$filters = $req->filters(); // Example: array( 'name' => 'Bob', 'age' => 21 )
 
 // SORTING
 //	Originally, Datatables returns the sort order
 //	by column index, but here you can get it using
 //	your own column names.
-$orders = $req->orders( array( 'id', 'name' ) );
-$idOrder = isset( $orders[ 'id' ] ) ? $orders[ 'id' ] : null;
-$nameOrder = isset( $orders[ 'name' ] ) ? $orders[ 'name' ] : null;
-var_dump( $idOrder ); // null, that means "not ordered by id"
-var_dump( $nameOrder ); // string("asc")
+$orders = $req->orders( array( 'name', 'age' ) ); // Example: array( 'name' => 'asc', 'age' => 'desc' )
 
 ...
 
 //
 // RESPONSE
 //
-
-$totalCount = ... // count your total table items
-$filteredCount = ... // count your filtered items
-$data = ... // your array
-$draw = $req->draw(); // This is a Datatables' control data
+$totalCount = /* total number of records to return */
+$filteredCount = /* filtered number of records to return */
+$data = /* items to return */
+$draw = $req->draw(); // From the request
 
 $res = new DataTablesResponse(
 	$totalCount, $filteredCount, $data, $draw );

@@ -1,11 +1,10 @@
 <?php
-namespace phputil;
+namespace phputil\datatables;
  
 /**
- * Response format used by DataTables.
+ * DataTables response.
  *
  * @author	Thiago Delgado Pinto
- *
  * @see		https://datatables.net/manual/server-side#Returned-data
  */
 class DataTablesResponse {
