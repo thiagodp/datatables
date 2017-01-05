@@ -12,7 +12,7 @@
 	},
 	"require": {
 		"php": ">=5.4",
-		"phputil/traits": "^1.3"
+		"phputil/traits": ">=1.3"
 	},
 	"require-dev": {
         "phpunit/phpunit": "=4.4.2"
