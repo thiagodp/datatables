@@ -16,11 +16,11 @@ class DataTablesRequest {
 	}
 
 	/** @var integer */
-	public $draw;
+	public $draw = 0;
 	/** @var integer */
-	public $start;
+	public $start = 0;
 	/** @var integer */
-	public $length;
+	public $length = 10;
 	/** @var array */
 	public $columns = array();
 	/** @var array */
