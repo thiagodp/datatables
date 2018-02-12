@@ -4,7 +4,7 @@
 	"description": "PHP representation of Datatables' request and response.",
 	"keywords": [ "table", "datatables", "php", "jquery" ],
 	"homepage": "http://github.com/thiagodp/datatables",
-	"license": "LGPL-3",
+	"license": "LGPL-3.0-or-later",
 	"authors": [ { "name": "Thiago Delgado Pinto" } ],
 	"support": {
 		"issues": "https://github.com/thiagodp/datatables/issues",
